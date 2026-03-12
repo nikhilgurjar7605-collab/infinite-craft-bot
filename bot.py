@@ -1,8 +1,10 @@
 import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from telegram.ext import Application, CommandHandler, ContextTypes
 import asyncio
+from telegram.ext import Application, CommandHandler, ContextTypes
+
+
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -126,15 +128,17 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def main():
-   await  app = Application.builder().token(BOT_TOKEN).build()
-   await  app.add_handler(CommandHandler("start", start))
-   await app.add_handler(CommandHandler("play", play))
-   await app.add_handler(CommandHandler("top", top))
-   await  app.add_handler(CommandHandler("discoveries", discoveries))
-   await app.add_handler(CommandHandler("help", help_cmd))
+async def main():
+    app = Application.builder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("play", play))
+    app.add_handler(CommandHandler("top", top))
+    app.add_handler(CommandHandler("discoveries", discoveries))
+    app.add_handler(CommandHandler("help", help_cmd))
     logger.info("Bot started...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES
+    await app.run_polling(allowed_updates=Update.ALL_TYPES)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())main()
+    import asyncio
+    asyncio.run(main())
