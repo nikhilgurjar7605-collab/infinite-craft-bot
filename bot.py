@@ -127,18 +127,19 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-
-async def main():
+def main():
     app = Application.builder().token(BOT_TOKEN).build()
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("play", play))
     app.add_handler(CommandHandler("top", top))
     app.add_handler(CommandHandler("discoveries", discoveries))
     app.add_handler(CommandHandler("help", help_cmd))
+
     logger.info("Bot started...")
-    await app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    main()
