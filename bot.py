@@ -19,13 +19,11 @@ SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
 
 # ── Keep Alive Server ─────────────────────────────────────
-# Render free tier sleeps after 15 min inactivity
-# This tiny HTTP server keeps it awake 24/7
 class PingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"Infinite Craft Bot is alive! 🤖")
+        self.wfile.write(b"Infinite Craft Bot is alive!")  # ASCII only!
 
     def log_message(self, format, *args):
         pass  # silence HTTP logs
@@ -62,24 +60,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     keyboard = [[
         InlineKeyboardButton(
-            "🧪 Play Infinite Craft",
+            "Play Infinite Craft",
             web_app=WebAppInfo(url=WEBAPP_URL)
         )
     ]]
     await update.message.reply_text(
-        f"👋 Hey {user.first_name}!\n\n"
+        f"Hey {user.first_name}!\n\n"
         f"Welcome to Infinite Craft!\n\n"
-        f"🌍 Start with Earth, Water, Fire & Wind\n"
-        f"⚗️ Combine elements to discover new ones\n"
-        f"🌟 Be the first to discover rare elements\n"
-        f"🏆 Climb the global leaderboard!\n\n"
-        f"Tap the button below to start playing 👇",
+        f"Start with Earth, Water, Fire and Wind\n"
+        f"Combine elements to discover new ones\n"
+        f"Be the first to discover rare elements\n"
+        f"Climb the global leaderboard!\n\n"
+        f"Tap the button below to start playing!",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
 
 async def top(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("⏳ Loading leaderboard...")
+    await update.message.reply_text("Loading leaderboard...")
     data = await supabase_get(
         "user_elements?select=telegram_id,users(username)&limit=2000"
     )
@@ -97,16 +95,14 @@ async def top(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )[:10]
 
     if not sorted_users:
-        await update.message.reply_text(
-            "No players yet! Be the first to play 🎮"
-        )
+        await update.message.reply_text("No players yet! Be the first to play!")
         return
 
-    medals = ["🥇", "🥈", "🥉"]
-    lines = ["🏆 Global Leaderboard\n"]
+    medals = ["1st", "2nd", "3rd"]
+    lines = ["Global Leaderboard\n"]
     for i, u in enumerate(sorted_users):
         medal = medals[i] if i < 3 else f"#{i+1}"
-        lines.append(f"{medal} @{u['username']} — {u['count']} elements")
+        lines.append(f"{medal} @{u['username']} - {u['count']} elements")
 
     await update.message.reply_text("\n".join(lines))
 
@@ -123,13 +119,14 @@ async def discoveries(update: Update, context: ContextTypes.DEFAULT_TYPE):
     first_count = len(first)
     keyboard = [[
         InlineKeyboardButton(
-            "🧪 Keep Playing", web_app=WebAppInfo(url=WEBAPP_URL)
+            "Keep Playing",
+            web_app=WebAppInfo(url=WEBAPP_URL)
         )
     ]]
     await update.message.reply_text(
-        f"🧪 Your Discoveries\n\n"
+        f"Your Discoveries\n\n"
         f"Total elements: {count}\n"
-        f"First discoveries: {first_count} 🌟\n\n"
+        f"First discoveries: {first_count}\n\n"
         f"{'Great job!' if count > 20 else 'Keep combining to discover more!'}",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -138,31 +135,30 @@ async def discoveries(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[
         InlineKeyboardButton(
-            "🧪 Open Game", web_app=WebAppInfo(url=WEBAPP_URL)
+            "Open Game",
+            web_app=WebAppInfo(url=WEBAPP_URL)
         )
     ]]
     await update.message.reply_text(
-        "Tap below to open Infinite Craft! 🚀",
+        "Tap below to open Infinite Craft!",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "📖 Infinite Craft Bot Commands\n\n"
-        "/start — Welcome + play button\n"
-        "/play — Open the game\n"
-        "/top — Global leaderboard\n"
-        "/discoveries — Your stats\n"
-        "/help — This message"
+        "Infinite Craft Bot Commands\n\n"
+        "/start - Welcome and play button\n"
+        "/play - Open the game\n"
+        "/top - Global leaderboard\n"
+        "/discoveries - Your stats\n"
+        "/help - This message"
     )
 
 
 # ── Main ──────────────────────────────────────────────────
 def main():
-    # Start keep-alive web server FIRST (stops Render sleeping)
     start_keep_alive()
-
     logger.info("Bot started...")
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
